@@ -1,0 +1,33 @@
+<div class="flex items-center justify-center min-h-screen bg-gray-100">
+  <div class="w-full max-w-md">
+    <form (ngSubmit)="register()" class="bg-white shadow-md rounded-lg px-8 pt-6 pb-8 mb-4">
+      <h2 class="text-2xl font-bold text-center mb-6">Register</h2>
+      
+      <div class="mb-5">
+        <label for="username" class="block mb-2 text-sm font-medium text-gray-700">Username</label>
+        <input [(ngModel)]="users.username" name="username" type="text" id="username" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Username" required>
+      </div>
+      
+      <div class="mb-5">
+        <label for="email" class="block mb-2 text-sm font-medium text-gray-700">Your email</label>
+        <input [(ngModel)]="users.email" name="email" type="email" id="email" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="name@gmail.com" required>
+      </div>
+      
+      <div class="mb-5">
+        <label for="password" class="block mb-2 text-sm font-medium text-gray-700">Password</label>
+        <input [(ngModel)]="users.password" name="password" type="password" id="password" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
+      </div>
+      
+      <div class="mb-5">
+        <label for="confirm-password" class="block mb-2 text-sm font-medium text-gray-700">Confirm Password</label>
+        <input [(ngModel)]="users.confirm_password" name="confirm_password" type="password" id="confirm-password" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
+      </div>
+      
+      <button type="submit" class="w-full text-white  bg-gray-900 hover:bg-gray-500 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Register</button>
+      
+      <div class="mt-4 text-center">
+        <span class="text-sm font-medium text-gray-700">Already have an account? <a href="#" class="text-blue-600 hover:underline">Login</a></span>
+      </div>
+    </form>
+  </div>
+</div>

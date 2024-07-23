@@ -1,0 +1,38 @@
+/* Add your custom styles here */
+
+.container {
+    max-width: 1200px;
+  }
+  
+  .bg-white {
+    background-color: #fff;
+  }
+  
+  .text-center {
+    text-align: center;
+  }
+  
+  .text-gray-500 {
+    color: #6b7280;
+  }
+  
+  .text-red-500 {
+    color: #ef4444;
+  }
+  
+  .text-red-700 {
+    color: #b91c1c;
+  }
+  
+  .bg-blue-700 {
+    background-color: #3b82f6;
+  }
+  
+  .bg-blue-800 {
+    background-color: #2563eb;
+  }
+  
+  .focus\:ring-blue-300:focus {
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.5);
+  }
+  
