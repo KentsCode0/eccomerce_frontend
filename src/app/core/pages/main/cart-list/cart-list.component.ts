@@ -19,27 +19,30 @@ export class CartListComponent implements OnInit {
 
   ngOnInit() {
     this.cartItems = this.cartService.getCartItems();
+    console.log(this.cartItems);
   }
 
   getTotalPrice(): number {
-    return this.cartItems
+    const total = this.cartItems
       .filter(item => item.selected)
       .reduce((total, item) => total + (+item.price * item.quantity), 0);
+  
+    return parseFloat(total.toFixed(2));
   }
+  
 
   removeFromCart(index: number) {
     this.cartService.removeFromCart(index);
     this.cartItems = this.cartService.getCartItems();
-    window.location.reload();
   }
 
-  increaseQuantity(itemId: number) {
-    this.cartService.increaseQuantity(itemId);
+  increaseQuantity(itemId: number, size: string) {
+    this.cartService.increaseQuantity(itemId, size);
     this.cartItems = this.cartService.getCartItems();
   }
 
-  decreaseQuantity(itemId: number) {
-    this.cartService.decreaseQuantity(itemId);
+  decreaseQuantity(itemId: number, size: string) {
+    this.cartService.decreaseQuantity(itemId, size);
     this.cartItems = this.cartService.getCartItems();
   }
 
@@ -69,5 +72,4 @@ export class CartListComponent implements OnInit {
       alert('Please select at least one item.');
     }
   }
-  
 }

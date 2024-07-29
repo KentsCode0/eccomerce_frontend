@@ -51,7 +51,8 @@ export class TokenService {
     
         if (!token && !userId) {
           console.log("Auth cleared successfully");
-          this.route.navigate(['/login']);
+          window.location.reload();
+          this.route.navigate(['./product-list']);
         } else {
           throw new Error("Failed to clear auth");
         }

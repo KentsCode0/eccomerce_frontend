@@ -1,29 +1,56 @@
 <app-navigation-bar></app-navigation-bar>
 
-<div class="container mx-auto p-4">
-    <div class="py-8 px-4 mx-auto max-w-screen-xl min-h-screen lg:py-16 lg:px-6">
-        <!-- Search Bar -->
-        <div class="mb-6">
-            <input
-                type="text"
-                placeholder="Search products..."
-                [(ngModel)]="searchTerm"
-                (input)="filterProducts()"
-                class="p-2 border border-gray-300 rounded-lg w-full"
-            />
-        </div>
-
-        <!-- Product List -->
-        <div class="grid gap-10 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-            <app-item-cards
-                *ngFor="let product of filteredProducts"
-                [id]="product.product_id.toString()"
-                [name]="product.product_name"
-                [description]="product.product_description"
-                [price]="product.product_price"
-                [image]="product.product_image"
-                (addToCart)="onAddToCart($event)">
-            </app-item-cards>
-        </div>
+<div class="container mx-auto p-4" [class.blurred]="selectedProduct">
+  <div class="py-8 px-4 mx-auto max-w-screen-xl min-h-screen lg:py-16 lg:px-6">
+    <!-- Category Filter -->
+    <div class="mb-6 flex space-x-4">
+      <button 
+        (click)="onSelectCategory(null)"
+        class="px-4 py-2 border border-gray-300 rounded-lg w-full cursor-pointer transition-transform transform hover:scale-105"
+        [class.bg-blue-600]="selectedCategory === null"
+        [class.text-white]="selectedCategory === null">
+        All Products
+      </button>
+      <button 
+        *ngFor="let category of categories" 
+        (click)="onSelectCategory(category.category_id)"
+        class="px-4 py-2 border border-gray-300 rounded-lg w-full cursor-pointer transition-transform transform hover:scale-105"
+        [class.bg-blue-600]="selectedCategory === category.category_id"
+        [class.text-white]="selectedCategory === category.category_id">
+        {{ category.category_name }}
+      </button>
     </div>
+
+    <!-- Search Bar -->
+    <div class="mb-6">
+      <input
+        type="text"
+        placeholder="Search products..."
+        [(ngModel)]="searchTerm"
+        (input)="filterProducts()"
+        class="p-2 border border-gray-300 rounded-lg w-full cursor-pointer transition ease-in-out delay-150 hover:-translate-y-2 hover:scale-130 duration-300 hover:shadow-sm"
+      />
+    </div>
+
+    <!-- Product List -->
+    <div class="grid gap-10 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+      <app-item-cards
+        *ngFor="let product of filteredProducts"
+        [id]="product.product_id.toString()"
+        [name]="product.product_name"
+        [description]="product.product_description"
+        [price]="product.product_price"
+        [image]="product.product_image"
+        (selectProduct)="onSelectProduct(product)"
+        (addToCart)="onAddToCart(product)">
+      </app-item-cards>
+    </div>
+  </div>
 </div>
+
+<app-product-item
+  *ngIf="selectedProduct"
+  [product]="selectedProduct"
+  (closePopup)="onClosePopup()"
+  (switchProduct)="onSwitchProduct($event)">
+</app-product-item>

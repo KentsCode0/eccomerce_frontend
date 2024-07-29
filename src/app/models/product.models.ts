@@ -6,6 +6,8 @@ type product = {
     product_price: string,
     created_at: string,
     updated_at: string,
+    category_id?: string;
+    category?: string;
 }
 
 export default product

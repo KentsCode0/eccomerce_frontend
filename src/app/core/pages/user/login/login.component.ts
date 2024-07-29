@@ -35,6 +35,8 @@ login() {
       const userId = response.data.user_id;
 
       this.tokenService.setAuthorization(token, userId);
+      
+      window.location.reload();
 
       this.router.navigate(['../product-list']);
     },

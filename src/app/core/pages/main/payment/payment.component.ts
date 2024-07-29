@@ -16,8 +16,10 @@ import { CartService } from '../../../../shared/services/cart.service';
 export class PaymentComponent implements OnInit{
   items: any[] = [];
   total: number = 0;
+  selectedPaymentMethod: string = '';
+  cardNumber: string = '';
 
-  constructor(private cartService: CartService, private Router: Router) {}
+  constructor(private cartService: CartService, private router: Router) {}
 
   ngOnInit(): void {
     this.items = this.cartService.getItems();
@@ -25,9 +27,17 @@ export class PaymentComponent implements OnInit{
   }
 
   processPayment() {
+    if (this.selectedPaymentMethod === 'creditCard' && !this.cardNumber) {
+      alert('Please enter your card number.');
+      return;
+    }
+
     console.log('Processing payment...');
+    console.log('Payment Method:', this.selectedPaymentMethod);
+    if (this.selectedPaymentMethod === 'creditCard') {
+      console.log('Card Number:', this.cardNumber);
+    }
     alert('Payment submitted!');
-    this.Router.navigate([`/product-list`])
+    this.router.navigate(['/product-list']);
   }
-  
 }

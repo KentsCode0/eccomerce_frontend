@@ -1,19 +1,29 @@
-<div class="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-    <a href="#" class="block relative overflow-hidden rounded-t-lg">
-        <img class=" object-cover w-full h-48" src="{{image}}" alt="product image" />
+<div (click)="selectProductHandler()" class="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 cursor-pointer transition-transform transform hover:scale-105">
+    <a class="block relative overflow-hidden rounded-t-lg">
+      <img class="object-cover w-full h-40" src="{{image}}" alt="product image" />
     </a>
-    <div class="px-5 pb-5">
+    <div class="px-5 pb-5 flex flex-col justify-between h-full" [ngClass]="{'h-auto': isExpanded, 'h-64': !isExpanded}">
+      <div>
         <a href="#">
-            <h5 class="text-xl font-semibold tracking-tight text-gray-900 dark:text-white">{{name}}</h5>
+          <h5 class="text-xl font-semibold tracking-tight text-gray-900 dark:text-white mt-3">{{name}}</h5>
         </a>
-        <div class="flex items-center mt-2.5 mb-5">
-            <div class="flex items-center max-h-3 space-x-1 rtl:space-x-reverse">
-                <h2 class="text-sm font-semibold tracking-tight text-gray-900 dark:text-white">{{description}}</h2>
-            </div>
+        <div class="mt-4 mb-4">
+          <div class="flex items-center space-x-1 rtl:space-x-reverse">
+            <h2 class="text-sm font-semibold tracking-tight text-gray-900 dark:text-white">
+              <span [ngClass]="{'line-clamp-2': !isExpanded}">{{description}}</span>
+              <ng-container *ngIf="shouldShowSeeMore(description)">
+                <button class="text-blue-500 ml-2 hover:text-blue-900">
+                  {{ isExpanded ? 'See Less' : 'See More' }}
+                </button>
+              </ng-container>
+            </h2>
+          </div>
         </div>
-        <div class="flex flex-col items-start">
-            <span class="text-xl font-bold text-gray-900 dark:text-white mb-3">PHP {{price}}</span>
-            <button (click)="addToCart()" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Add to cart</button>
-        </div>
+      </div>
+      <div class="flex flex-col items-start mt-auto">
+        <span class="text-xl font-bold text-gray-900 dark:text-white mb-3">${{price}}</span>
+        <button (click)="addToCartHandler($event)" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Add to cart</button>
+      </div>
     </div>
-</div>
+  </div>
+  

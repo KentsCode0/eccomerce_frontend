@@ -1,16 +1,21 @@
 import { Injectable } from '@angular/core';
 import { CookieService } from 'ngx-cookie-service';
 import { TokenService } from './token.service';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CartService {
   private readonly CART_KEY_PREFIX = 'cart_items_'; 
+  private cartItemCountSubject = new BehaviorSubject<number>(0);
+  cartItemCount$ = this.cartItemCountSubject.asObservable();
   private items: any[] = [];
   private total: number = 0;
 
-  constructor(private cookieService: CookieService, private tokenService: TokenService) {}
+  constructor(private cookieService: CookieService, private tokenService: TokenService) {
+    this.updateCartItemCount(); // Initialize the cart item count
+  }
 
   // Retrieve cart items for the current user
   getCartItems(): any[] {
@@ -31,12 +36,16 @@ export class CartService {
       return;
     }
     this.cookieService.set(this.CART_KEY_PREFIX + userId, JSON.stringify(items));
+    this.updateCartItemCount(); // Update cart item count
   }
 
   // Add an item to the cart
   addToCart(item: any): void {
     const cartItems = this.getCartItems();
-    const existingItem = cartItems.find(cartItem => cartItem.id === item.id);
+    const existingItem = cartItems.find(cartItem => 
+      cartItem.id.toString() === item.id.toString() &&
+      cartItem.size === item.size
+    );
 
     if (existingItem) {
       existingItem.quantity += 1;
@@ -53,13 +62,15 @@ export class CartService {
     const cartItems = this.getCartItems();
     cartItems.splice(index, 1);
     this.saveCartItems(cartItems);
-    
   }
 
   // Increase the quantity of an item
-  increaseQuantity(itemId: number): void {
+  increaseQuantity(itemId: number, size: string): void {
     const cartItems = this.getCartItems();
-    const item = cartItems.find(cartItem => cartItem.id === itemId);
+    const item = cartItems.find(cartItem => 
+      cartItem.id === itemId &&
+      cartItem.size === size
+    );
 
     if (item) {
       item.quantity += 1;
@@ -68,9 +79,12 @@ export class CartService {
   }
 
   // Decrease the quantity of an item
-  decreaseQuantity(itemId: number): void {
+  decreaseQuantity(itemId: number, size: string): void {
     const cartItems = this.getCartItems();
-    const item = cartItems.find(cartItem => cartItem.id === itemId);
+    const item = cartItems.find(cartItem => 
+      cartItem.id === itemId &&
+      cartItem.size === size
+    );
 
     if (item) {
       if (item.quantity > 1) {
@@ -79,27 +93,30 @@ export class CartService {
         // Remove the item if quantity is 1
         const index = cartItems.indexOf(item);
         cartItems.splice(index, 1);
-        window.location.reload();
       }
       this.saveCartItems(cartItems);
     }
   }
 
-  // Get the count of items in the cart
-  getCartItemCount(): number {
+  // Update the count of items in the cart
+  updateCartItemCount(): void {
     const cartItems = this.getCartItems();
-    return cartItems.length;
+    const itemCount = cartItems.reduce((count, item) => count + item.quantity, 0);
+    this.cartItemCountSubject.next(itemCount);
   }
-  // set items to payment
+  
+  // Set items to payment
   setItems(items: any[], total: number) {
     this.items = items;
-    this.total = total;
+    this.total = parseFloat(total.toFixed(2));
   }
-  // get items
+
+  // Get items
   getItems() {
     return this.items;
   }
-  // get total
+
+  // Get total
   getTotal() {
     return this.total;
   }

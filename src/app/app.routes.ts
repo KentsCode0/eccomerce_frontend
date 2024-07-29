@@ -4,11 +4,12 @@ import { RegisterComponent } from './core/pages/user/register/register.component
 import { ProductListComponent } from './core/pages/main/product-list/product-list.component';
 import { CartListComponent } from './core/pages/main/cart-list/cart-list.component';
 import { PaymentComponent } from './core/pages/main/payment/payment.component';
+import { ProductItemComponent } from './core/pages/main/product-item/product-item.component';
 
 export const routes: Routes = [
     {
         path: '',
-        redirectTo: 'login',
+        redirectTo: 'product-list',
         pathMatch: 'full'
     },
     {
