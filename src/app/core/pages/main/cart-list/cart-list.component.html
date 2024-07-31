@@ -3,10 +3,10 @@
     <div class="py-8 px-4 mx-auto max-w-screen-xl flex-1">
         <div class="bg-white shadow-md rounded-lg px-8 pt-6 pb-8 mb-4">
             <h2 class="text-2xl font-bold text-center mb-6">Your Cart</h2>
-            <div *ngIf="cartItems.length === 0" class="text-center text-gray-500">
+            <div *ngIf="products.length === 0" class="text-center text-gray-500">
                 Your cart is empty.
             </div>
-            <div *ngIf="cartItems.length > 0">
+            <div *ngIf="products && products.length > 0">
                 <!-- Select All Checkbox -->
                 <div class="mb-4">
                     <input 
@@ -20,7 +20,7 @@
                 </div>
                 
                 <ul class="divide-y divide-gray-200">
-                    <li *ngFor="let item of cartItems; let i = index" class="py-4 w-[85%] flex items-center justify-between cursor-pointer transition ease-in-out delay-150 hover:-translate-x-3 hover:scale-130 duration-300 hover:shadow-sm">
+                    <li *ngFor="let item of products; let i = index" class="py-4 w-[85%] flex items-center justify-between cursor-pointer transition ease-in-out delay-150 hover:-translate-x-3 hover:scale-130 duration-300 hover:shadow-sm">
                         <div class="flex items-center space-x-4">
                             <!-- Checkbox for each item -->
                             <input 
@@ -29,19 +29,25 @@
                                 (change)="toggleSelection(item)"
                                 class="custom-checkbox mr-4"
                             />
-                            <img [src]="item.image" alt="Product Image" class="w-16 h-16 object-cover rounded-lg">
+                            <img [src]="item.product_image" alt="Product Image" class="w-16 h-16 object-cover rounded-lg">
                             <div>
-                                <h2 class="text-xl font-semibold">{{ item.name }}</h2>
-                                <p>Size: {{ item.size }}</p>
-                                <p>Price: ${{ item.price }}</p>
+                                <h2 class="text-xl font-semibold">{{ item.product_name }}</h2>
+                                <p>Size: {{ item.size_label }}</p>
+                                <p>Price: ${{ item.product_price }}</p>
                                 <p>Quantity: 
-                                    <button (click)="decreaseQuantity(item.id, item.size)" class="px-2 py-1 border border-gray-300 rounded-lg">-</button>
-                                    {{ item.quantity }}
-                                    <button (click)="increaseQuantity(item.id, item.size)" class="px-2 py-1 border border-gray-300 rounded-lg">+</button>
+                                    <button (click)="decreaseQuantity(item.product_id, item.size_id, item.quantity)" class="px-2 py-1 border border-gray-300 rounded-lg">-</button>
+                                    <input 
+                                        type="number" 
+                                        [value]="item.quantity" 
+                                        (input)="onQuantityChange($event, item.product_id, item.size_id)" 
+                                        class="w-16 text-center border border-gray-300 rounded-lg mx-2"
+                                        min="1" 
+                                    />
+                                    <button (click)="increaseQuantity(item.product_id, item.size_id, item.quantity)" class="px-2 py-1 border border-gray-300 rounded-lg">+</button>
                                 </p>
                             </div>
                         </div>
-                        <button (click)="removeFromCart(i)" class="text-red-500 hover:text-red-900 cursor-pointer transition-transform transform hover:scale-105">
+                        <button (click)="removeFromCart(item.product_id, item.size_id)" class="text-red-500 hover:text-red-900 cursor-pointer transition-transform transform hover:scale-105">
                             Remove
                         </button>
                     </li>
@@ -51,7 +57,7 @@
     </div>
 
     <!-- Fixed Sidebar for Checkout -->
-    <div class="fixed right-0 top-44 w-80 bg-white shadow-lg p-6 rounded-lg h-screen overflow-y-auto">
+    <div class="fixed right-0 top-12 w-80 bg-white shadow-lg p-6 rounded-lg h-screen overflow-y-auto">
         <h3 class="text-xl font-semibold mb-4">Checkout Summary</h3>
         <div *ngIf="hasSelectedItems()">
             <p class="text-lg font-semibold mb-4">Total: ${{ getTotalPrice() }}</p>

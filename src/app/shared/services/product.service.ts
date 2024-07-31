@@ -34,4 +34,5 @@ export class ProductService {
   getProductCategory(productId: any): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/products/${productId}/categories`);
   }
+  
 }

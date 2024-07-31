@@ -4,7 +4,8 @@ import { Subscription } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { UserService } from '../../../shared/services/user.service';
+import { TokenService } from '../../../shared/services/token.service';
+import product from '../../../models/product.models';
 
 @Component({
   selector: 'app-item-cards',
@@ -15,48 +16,35 @@ import { UserService } from '../../../shared/services/user.service';
 })
 export class ItemCardsComponent implements OnDestroy {
   @Input() id: string = '';
-  @Input() category_id: string = '';
   @Input() name: string = '';
   @Input() description: string = '';
   @Input() price: string = '';
   @Input() image: string = '';
-  @Output() addToCart = new EventEmitter<void>();
+  @Input() product: product | null = null;
+  @Output() addToCart = new EventEmitter<{ product_id: string, size_id: number, quantity: number }>();
   @Output() selectProduct = new EventEmitter<void>();
+
+  size_id: number = 1; // Default size_id
+  quantity: number = 1;
 
   private cartSubscription!: Subscription;
   cartItemCount: number = 0;
   isExpanded: boolean = false;
-  
-  constructor(private cartService: CartService, private cdr: ChangeDetectorRef, private router: Router, private userService: UserService) {
+
+  constructor(private cartService: CartService, private cdr: ChangeDetectorRef, private router: Router, private tokenService: TokenService) {
     this.updateCartCount();
   }
 
   addToCartHandler(event: Event) {
-    event.stopPropagation(); // Prevent triggering the select event
-    this.userService.getUserInformation().subscribe(
-      response => {
-        if (response.data.user.user_id) {
-          const product = {
-            id: this.id,
-            name: this.name,
-            description: this.description,
-            price: this.price,
-            image: this.image
-          };
-          this.cartService.addToCart(product);
-        } else {
-          this.router.navigate(['/login']);
-        }
-      },
-      error => {
-        this.router.navigate(['/login']);
-      }
-    );
+    // event.stopPropagation(); // Prevent triggering the select event
+    if (this.product) {
+      this.addToCart.emit({
+        product_id: this.product.product_id.toString(), // Ensure it is a string
+        size_id: this.size_id,
+        quantity: this.quantity
+      });
+    }
   }
-
-  // toggleDescription() {
-  //   this.isExpanded = !this.isExpanded;
-  // }
 
   selectProductHandler() {
     this.selectProduct.emit();
@@ -66,10 +54,14 @@ export class ItemCardsComponent implements OnDestroy {
     return description.length > 40;
   }
 
+  truncateName(name: string): string {
+    return name.length > 25 ? name.substring(0, 25) + '...' : name;
+  }
+
   updateCartCount() {
-    this.cartSubscription = this.cartService.cartItemCount$.subscribe(count => {
-      this.cartItemCount = count;
-    });
+    // this.cartSubscription = this.cartService.cartItemCount$.subscribe(count => {
+    //   this.cartItemCount = count;
+    // });
   }
 
   ngOnDestroy(): void {
@@ -79,6 +71,6 @@ export class ItemCardsComponent implements OnDestroy {
   }
 
   goToProductItem() {
-    this.router.navigate([`./product-item/${this.id}`])
+    this.router.navigate([`./product-item/${this.id}`]);
   }
 }

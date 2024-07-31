@@ -3,11 +3,14 @@ import { ProductService } from '../../../../shared/services/product.service';
 import { CartService } from '../../../../shared/services/cart.service';
 import { CommonModule } from '@angular/common';
 import product from '../../../../models/product.models';
+import { TokenService } from '../../../../shared/services/token.service';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-product-item',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './product-item.component.html',
   styleUrls: ['./product-item.component.css']
 })
@@ -20,10 +23,13 @@ export class ProductItemComponent implements OnInit {
   filteredProducts: Array<product> = [];
   sizes: any[] = [];
   selectedSize: string | null = null;
+  quantity: number = 1; // Initialize quantity
 
   constructor(
     private productService: ProductService,
-    private cartService: CartService
+    private cartService: CartService,
+    private tokenService: TokenService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -55,7 +61,7 @@ export class ProductItemComponent implements OnInit {
       (response) => {
         this.sizes = response.data.sizes;
         if (this.sizes.length > 0) {
-          this.selectedSize = this.sizes[0].size_label; // Set default size to the first one
+          this.selectedSize = this.sizes[0].size_id; // Set default size to the first one
         }
       },
       (error) => {
@@ -79,16 +85,67 @@ export class ProductItemComponent implements OnInit {
   }
 
   addToCart() {
+    const userId = this.tokenService.getUserId();
+    // Check if userId exists
+  if (!userId) {
+    // Redirect to login page
+    this.router.navigate(['/login']);
+    return;
+  }
     if (this.product && this.selectedSize) {
       const productToAdd = {
-        id: this.product.product_id,
-        name: this.product.product_name,
-        description: this.product.product_description,
-        price: this.product.product_price,
-        image: this.product.product_image,
-        size: this.selectedSize
+        user_id: userId,
+        product_id: this.product.product_id.toString(),
+        size_id: this.selectedSize.toString(),
+        quantity: this.quantity,
       };
-      this.cartService.addToCart(productToAdd);
+
+      this.cartService.getCart().subscribe(
+        (cart) => {
+
+          // Ensure cart.data.carts is an array
+          const cartItems = Array.isArray(cart.data.carts) ? cart.data.carts : [];
+
+          const existingItem = cartItems.find(
+            (item: any) =>
+              item.product_id.toString() === productToAdd.product_id && item.size_id.toString() === productToAdd.size_id
+          );
+
+          if (existingItem) {
+            // Product with the same product_id and size_id exists, update the quantity
+            const updatedQuantity = existingItem.quantity + this.quantity;
+
+            this.cartService.editCart(userId, productToAdd.product_id, productToAdd.size_id, updatedQuantity).subscribe(
+              (response) => {
+                this.cartService.getCart().subscribe(); // Trigger cart refresh
+              },
+              (error) => {
+                console.error('Error updating product in cart:', error);
+              }
+            );
+          } else {
+            // Product with the same product_id and size_id does not exist, add new item to cart
+            this.cartService.insertProductToCart(productToAdd).subscribe(
+              (response) => {
+                this.cartService.getCart().subscribe(); // Trigger cart refresh
+              },
+              (error) => {
+                console.error('Error adding product to cart:', error);
+              }
+            );
+          }
+        },
+        (error) => {
+          this.cartService.insertProductToCart(productToAdd).subscribe(
+            (response) => {
+              this.cartService.getCart().subscribe(); // Trigger cart refresh
+            },
+            (error) => {
+              console.error('Error adding product to cart:', error);
+            }
+          );
+        }
+      );
     }
   }
 

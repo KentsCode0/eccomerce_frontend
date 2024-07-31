@@ -1,0 +1,50 @@
+<button (click)="goToAdmin()" class="justify-start ml-6 mt-4 pl-4 pr-4 pt-1 pb-1 text-white bg-blue-500 hover:bg-blue-700 rounded-lg">
+    Back
+  </button>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+    
+    <div *ngFor="let product of products" class="border border-gray-200 rounded-lg shadow-lg bg-white overflow-hidden">
+      <!-- Product Image -->
+      <div class="relative">
+        <img [src]="product.product_image" alt="{{ product.product_name }}" class="w-full h-48 object-cover">
+        <div class="absolute inset-0 bg-black bg-opacity-25 flex items-center justify-center text-white text-lg font-bold">
+          {{ product.product_name }}
+        </div>
+      </div>
+      <!-- Product Details -->
+      <div class="p-4">
+        <!-- <p class="text-gray-600 mb-4">{{ product.product_description }}</p> -->
+        <div class="mb-4">
+          <h4 class="font-semibold mb-2">Categories</h4>
+          <div class="flex flex-wrap gap-2">
+            <ng-container *ngFor="let category of categories">
+              <label class="flex items-center text-sm">
+                <input type="checkbox" 
+                       [value]="category.category_id" 
+                       (change)="onCategoryChange($event, product.product_id)" 
+                       [checked]="productCategories[product.product_id]?.includes(category.category_id)"
+                       class="mr-2"/>
+                {{ category.category_name }}
+              </label>
+            </ng-container>
+          </div>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-2">Sizes</h4>
+          <div class="flex flex-wrap gap-2">
+            <ng-container *ngFor="let size of sizes">
+              <label class="flex items-center text-sm">
+                <input type="checkbox" 
+                       [value]="size.size_id" 
+                       (change)="onSizeChange($event, product.product_id)" 
+                       [checked]="productSizes[product.product_id]?.includes(size.size_id)"
+                       class="mr-2"/>
+                {{ size.size_label }}
+              </label>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  

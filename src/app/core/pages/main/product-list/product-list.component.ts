@@ -7,6 +7,7 @@ import product from '../../../../models/product.models';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProductItemComponent } from "../product-item/product-item.component";
+import { TokenService } from '../../../../shared/services/token.service';
 
 @Component({
   selector: 'app-product-list',
@@ -23,7 +24,7 @@ export class ProductListComponent implements OnInit {
   categories: any[] = [];
   selectedCategory: string | null = null;
 
-  constructor(private productService: ProductService, private cartService: CartService) {}
+  constructor(private productService: ProductService, private cartService: CartService, private tokenService: TokenService) {}
 
   ngOnInit() {
     this.getAllProducts();
@@ -46,7 +47,6 @@ export class ProductListComponent implements OnInit {
     this.productService.getAllProductCategory().subscribe(
       (response) => {
         this.categories = response.data.categories;
-        console.log(this.categories);
       },
       (error) => {
         console.error(error);
@@ -62,7 +62,6 @@ export class ProductListComponent implements OnInit {
           if (categories && categories.length > 0) {
             product.category_id = categories.map((category: { category_id: any; }) => category.category_id); // Store all category IDs
           }
-          console.log(categories);
           this.filterProducts();
         },
         (error) => {
@@ -71,7 +70,6 @@ export class ProductListComponent implements OnInit {
       );
     });
   }
-  
 
   onSelectCategory(categoryId: string | null) {
     this.selectedCategory = categoryId;
@@ -88,10 +86,22 @@ export class ProductListComponent implements OnInit {
       return matchesSearchTerm && matchesCategory;
     });
   }
-  
 
-  onAddToCart(product: product) {
-    this.cartService.addToCart(product);
+  onAddToCart(event: { product_id: string, size_id: number, quantity: number }) {
+    const userId = this.tokenService.getUserId();
+    const productToAdd = {
+      user_id: userId,
+      product_id: event.product_id,
+      size_id: event.size_id,
+      quantity: event.quantity,
+    };
+    this.cartService.insertProductToCart(productToAdd).subscribe(
+      (response) => {
+      },
+      (error) => {
+        console.error(error);
+      }
+    );
   }
 
   onSelectProduct(product: product) {

@@ -1,5 +1,5 @@
 type product = {
-    product_id: number,
+    product_id: string,
     product_name: string,
     product_description: string,
     product_image: string,

@@ -1,123 +1,80 @@
 import { Injectable } from '@angular/core';
-import { CookieService } from 'ngx-cookie-service';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
 import { TokenService } from './token.service';
-import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CartService {
-  private readonly CART_KEY_PREFIX = 'cart_items_'; 
+  private apiUrl = 'http://localhost/ecommerce-api/public/api';
   private cartItemCountSubject = new BehaviorSubject<number>(0);
+
   cartItemCount$ = this.cartItemCountSubject.asObservable();
-  private items: any[] = [];
-  private total: number = 0;
 
-  constructor(private cookieService: CookieService, private tokenService: TokenService) {
-    this.updateCartItemCount(); // Initialize the cart item count
-  }
+  constructor(private http: HttpClient, private tokenService: TokenService) { }
 
-  // Retrieve cart items for the current user
-  getCartItems(): any[] {
-    const userId = this.tokenService.getUserId();
-    if (!userId) {
-      console.error('User ID not found');
-      return [];
-    }
-    const cartItems = this.cookieService.get(this.CART_KEY_PREFIX + userId);
-    return cartItems ? JSON.parse(cartItems) : [];
-  }
-
-  // Save cart items for the current user
-  saveCartItems(items: any[]): void {
-    const userId = this.tokenService.getUserId();
-    if (!userId) {
-      console.error('User ID not found');
-      return;
-    }
-    this.cookieService.set(this.CART_KEY_PREFIX + userId, JSON.stringify(items));
-    this.updateCartItemCount(); // Update cart item count
-  }
-
-  // Add an item to the cart
-  addToCart(item: any): void {
-    const cartItems = this.getCartItems();
-    const existingItem = cartItems.find(cartItem => 
-      cartItem.id.toString() === item.id.toString() &&
-      cartItem.size === item.size
+  insertProductToCart(product: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/cart`, product).pipe(
+      tap(() => {
+        this.updateCartCount();  // Update cart count after adding a product
+      }),
+      catchError(error => {
+        console.error('Error adding product to cart:', error);
+        return throwError(error);
+      })
     );
-
-    if (existingItem) {
-      existingItem.quantity += 1;
-    } else {
-      item.quantity = 1;
-      cartItems.push(item);
-    }
-
-    this.saveCartItems(cartItems);
-  }
-
-  // Remove an item from the cart
-  removeFromCart(index: number): void {
-    const cartItems = this.getCartItems();
-    cartItems.splice(index, 1);
-    this.saveCartItems(cartItems);
-  }
-
-  // Increase the quantity of an item
-  increaseQuantity(itemId: number, size: string): void {
-    const cartItems = this.getCartItems();
-    const item = cartItems.find(cartItem => 
-      cartItem.id === itemId &&
-      cartItem.size === size
-    );
-
-    if (item) {
-      item.quantity += 1;
-      this.saveCartItems(cartItems);
-    }
-  }
-
-  // Decrease the quantity of an item
-  decreaseQuantity(itemId: number, size: string): void {
-    const cartItems = this.getCartItems();
-    const item = cartItems.find(cartItem => 
-      cartItem.id === itemId &&
-      cartItem.size === size
-    );
-
-    if (item) {
-      if (item.quantity > 1) {
-        item.quantity -= 1;
-      } else {
-        // Remove the item if quantity is 1
-        const index = cartItems.indexOf(item);
-        cartItems.splice(index, 1);
-      }
-      this.saveCartItems(cartItems);
-    }
-  }
-
-  // Update the count of items in the cart
-  updateCartItemCount(): void {
-    const cartItems = this.getCartItems();
-    const itemCount = cartItems.reduce((count, item) => count + item.quantity, 0);
-    this.cartItemCountSubject.next(itemCount);
   }
   
-  // Set items to payment
-  setItems(items: any[], total: number) {
-    this.items = items;
-    this.total = parseFloat(total.toFixed(2));
+  getCart(): Observable<any> {
+    const userId = this.tokenService.getUserId();
+    return this.http.get<any>(`${this.apiUrl}/cart/${userId}`).pipe(
+      tap(cart => {
+        this.updateCartCount(cart);
+      }),
+      catchError(error => {
+        console.error('Error fetching cart:', error);
+        return throwError(error);
+      })
+    );
+  }
+  
+
+  editCart(userId: any, productId: any, sizeId: any, quantity: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/cart/${userId}/${productId}/${sizeId}`, { quantity }).pipe(
+      tap(() => this.updateCartCount())
+    );
+  }
+  
+  deleteItemFromCart(userId: any, productId: any, sizeId: any): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/cart/${userId}/${productId}/${sizeId}`).pipe(
+      tap(() => {
+        this.updateCartCount();
+        // Reload the window after updating the cart count
+        window.location.reload();
+      })
+    );
   }
 
-  // Get items
-  getItems() {
-    return this.items;
+  public updateCartCount(cartResponse?: any): void {
+    // Check if cartResponse and cartResponse.data are defined
+    if (cartResponse && cartResponse.data) {
+      // Log the entire response for debugging
+  
+      // Ensure cartItems is an array
+      const cartItems = Array.isArray(cartResponse.data.carts) ? cartResponse.data.carts : [];
+  
+      // Calculate total quantity
+      const totalQuantity = cartItems.reduce((acc: number, item: any) => acc + (item.quantity || 0), 0);
+  
+      // Log total quantity for debugging
+  
+      this.cartItemCountSubject.next(totalQuantity);
+    } else {
+      // Log response for debugging
+      this.cartItemCountSubject.next(0);
+    }
   }
-
-  // Get total
-  getTotal() {
-    return this.total;
-  }
+  
 }

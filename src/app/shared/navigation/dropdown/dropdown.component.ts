@@ -1,6 +1,5 @@
-import { ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { UserService } from '../../services/user.service';
 import { CartService } from '../../services/cart.service';
 import { TokenService } from '../../services/token.service';
 import { Subscription } from 'rxjs';
@@ -25,16 +24,19 @@ export class DropdownComponent implements OnInit, OnDestroy {
 
   constructor(
     private router: Router,
-    private userService: UserService,
     private cartService: CartService,
     private tokenService: TokenService,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    // this.getUser();
+    // Fetch initial cart count
+    this.loadCartCount();
+
+    // Subscribe to cart item count changes
     this.cartSubscription = this.cartService.cartItemCount$.subscribe(count => {
       this.cartItemCount = count;
+      this.cdr.markForCheck(); // Ensure Angular detects the change
     });
   }
 
@@ -44,26 +46,14 @@ export class DropdownComponent implements OnInit, OnDestroy {
     }
   }
 
-  // getUser() {
-  //   this.userService.getUserInformation().subscribe(response => {
-  //     this.userInfo.username = response.data.user.username;
-  //     this.userInfo.email = response.data.user.email;
-  //   });
-  // }
+  // Method to load cart count initially
+  private loadCartCount(): void {
+    this.cartService.getCart().subscribe(cartResponse => {
+      this.cartService.updateCartCount(cartResponse); // Ensure cart count is updated
+    });
+  }
 
   navigateToCart() {
     this.router.navigate([`./cart`]);
   }
-
-  // signOut() {
-  //   this.tokenService.clearAuth();
-  // }
-
-  // toggleDropdown() {
-  //   this.isOpen = !this.isOpen;
-  // }
-
-  // closeDropdown() {
-  //   this.isOpen = false;
-  // }
 }

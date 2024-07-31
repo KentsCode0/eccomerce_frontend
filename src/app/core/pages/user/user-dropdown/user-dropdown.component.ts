@@ -35,9 +35,9 @@ export class userDropdownComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.checkUser();
-    this.cartSubscription = this.cartService.cartItemCount$.subscribe(count => {
-      this.cartItemCount = count;
-    });
+    // this.cartSubscription = this.cartService.cartItemCount$.subscribe(count => {
+    //   this.cartItemCount = count;
+    // });
   }
 
   ngOnDestroy(): void {
@@ -49,6 +49,7 @@ export class userDropdownComponent implements OnInit, OnDestroy {
   checkUser() {
     this.userService.getUserInformation().subscribe(
       response => {
+        this.userInfo.user_id = response.data.user.user_id;
         this.userInfo.username = response.data.user.username;
         this.userInfo.email = response.data.user.email;
         this.userExists = true;

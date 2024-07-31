@@ -41,7 +41,6 @@ login() {
       this.router.navigate(['../product-list']);
     },
     (error)=> {
-      console.log(error)
     }
   )
 }

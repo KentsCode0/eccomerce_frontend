@@ -42,7 +42,6 @@ export class TokenService {
     let attempts = 0;
     const attemptDelete = () => {
       try {
-        console.log("Attempting to clear auth...");
         this.cookieService.delete(this.TOKEN_KEY, '/');
         this.cookieService.delete(this.USER_ID_KEY, '/');
     
@@ -50,7 +49,6 @@ export class TokenService {
         const userId = this.cookieService.get(this.USER_ID_KEY);
     
         if (!token && !userId) {
-          console.log("Auth cleared successfully");
           window.location.reload();
           this.route.navigate(['./product-list']);
         } else {

@@ -1,18 +1,19 @@
-<div class="flex items-center justify-center min-h-screen bg-gray-100 ">
-  <form (ngSubmit)="login()" class="w-full bg-white shadow-md rounded-lg px-8 pt-6 pb-8 mb-4 max-w-sm mx-auto cursor-pointer transition ease-in-out delay-150  hover:-translate-y-1 hover:scale-130  duration-300 hover:shadow-sm">
+<div class="flex items-center justify-center min-h-screen bg-gray-100">
+  <img class="ml-4" src="../../../../../assets/images/product/logo.png" alt="logo">
+  <form (ngSubmit)="login()" class="w-full bg-white shadow-md rounded-lg px-8 pt-6 pb-8 mb-4 max-w-sm mx-auto cursor-pointer transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-130 duration-300 hover:shadow-sm">
     <h2 class="text-2xl font-bold text-center mb-6">Login</h2>
     <div class="mb-5">
       <label for="email" class="block mb-2 text-sm font-medium text-gray-700">Your email</label>
-      <input [(ngModel)]="credentials.email" name="email" type="email" id="email" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 cursor-pointer transition ease-in-out delay-150  hover:-translate-y-1 hover:scale-130  duration-300 hover:shadow-sm" placeholder="name@gmail.com" required />
+      <input [(ngModel)]="credentials.email" name="email" type="email" id="email" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 cursor-pointer transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-130 duration-300 hover:shadow-sm" placeholder="name@gmail.com" required />
     </div>
     <div class="mb-5">
       <label for="password" class="block mb-2 text-sm font-medium text-gray-700">Your password</label>
-      <input [(ngModel)]="credentials.password" name="password" type="password" id="password" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 cursor-pointer transition ease-in-out delay-150  hover:-translate-y-1 hover:scale-130  duration-300 hover:shadow-sm" placeholder="••••••••" required />
+      <input [(ngModel)]="credentials.password" name="password" type="password" id="password" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 cursor-pointer transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-130 duration-300 hover:shadow-sm" placeholder="••••••••" required />
     </div>
 
-    <button type="submit" class="w-full text-white bg-gray-900 hover:bg-gray-500 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center cursor-pointer transition ease-in-out delay-150  hover:-translate-y-1 hover:scale-130  duration-300 hover:shadow-sm">Login</button>
+    <button type="submit" class="w-full text-white bg-gray-900 hover:bg-gray-500 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center cursor-pointer transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-130 duration-300 hover:shadow-sm">Login</button>
     <div class="mt-4 text-center">
-      <span class="text-sm font-medium text-gray-700">Does not have an account? <a routerLink="/register" class="text-blue-600 hover:underline cursor-pointer transition ease-in-out delay-150  hover:-translate-y-1 hover:scale-130  duration-300 hover:shadow-sm">Register</a></span>
+      <span class="text-sm font-medium text-gray-700">Does not have an account? <a routerLink="/register" class="text-blue-600 hover:underline cursor-pointer transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-130 duration-300 hover:shadow-sm">Register</a></span>
     </div>
   </form>
 </div>
