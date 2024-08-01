@@ -19,6 +19,13 @@ export class RegisterComponent {
     confirm_password: ''
   };
 
+  errors = {
+    username: "",
+    email: "",
+    password: "",
+    password1: ""
+  }
+
   constructor(private userService: UserService, private router: Router) {}
 
   register() {
@@ -27,6 +34,22 @@ export class RegisterComponent {
         this.router.navigate(['/login']);
       },
       (error) => {
+        let errors = error.error.errors;
+          this.errors["username"] = errors["username"];
+          this.errors["email"] = errors["email"];
+          this.errors["password"] = errors["password"];
+          this.errors["password1"] = errors["password1"];
+  
+          // Clear the error messages after 3 seconds
+          setTimeout(() => {
+            this.errors = {
+              username: '',
+              email: '',
+              password: '',
+              password1: ''
+            };
+          }, 3000);
+
       }
     );
   }

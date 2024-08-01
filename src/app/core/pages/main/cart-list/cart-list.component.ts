@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 import { TokenService } from '../../../../shared/services/token.service';
 import { ProductService } from '../../../../shared/services/product.service';
 import { CheckoutService } from '../../../../shared/services/checkout.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-cart-list',
@@ -130,12 +131,42 @@ export class CartListComponent implements OnInit {
 
   goToCheckout() {
     if (this.hasSelectedItems()) {
-      const selectedItems = this.products.filter(item => item.selected);
-      const total = this.getTotalPrice();
+      const selectedItems = this.products
+        .filter(item => item.selected)
+        .map(item => ({
+          product_id: item.product_id,
+          size_id: item.size_id,
+          quantity: item.quantity,
+          price: parseFloat(item.product_price).toFixed(2) // Format price correctly
+        }));
   
-      this.checkoutService.setItems(selectedItems, +total);
-      this.router.navigate(['/payment']);
+      console.log(selectedItems);
+  
+      const total = parseFloat(this.getTotalPrice());
+  
+      this.checkoutService.createOrder(this.userId, total).subscribe(
+        (response: any) => {
+          const orderId = response.data.order_id;
+          console.log(orderId);
+  
+          // Get an array of observables for creating order items
+          const observables = this.checkoutService.createOrderItems(orderId, selectedItems);
+  
+          // Execute each observable one at a time
+          forkJoin(observables).subscribe(
+            () => {
+              console.log(response);
+              this.router.navigate(['/payment'], { queryParams: { orderId } });
+            },
+            (error) => {
+              console.error('Failed to create order item:', error);
+            }
+          );
+        },
+        (error) => {
+          console.error('Failed to create order:', error);
+        }
+      );
     }
   }
-  
 }

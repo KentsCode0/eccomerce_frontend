@@ -32,4 +32,31 @@ export class UserService {
       return throwError('Unauthorized access');
     }
   }
+
+  uploadAvatar(avatar: any): Observable<any> {
+    const authInfo = this.tokenService.getAuth();
+    if (authInfo) {
+      const userId = authInfo[1];
+      const headers = new HttpHeaders({
+        'Authorization': `Bearer ${authInfo[0]}`
+      });
+      return this.http.post<any>(`${this.apiUrl}/users/${userId}/avatar`, avatar, { headers: headers });
+    } else {
+      return throwError('Unauthorized access');
+    }
+  }
+
+  editUser(user: any): Observable<any> {
+    const authInfo = this.tokenService.getAuth();
+    if (authInfo) {
+      const userId = authInfo[1];
+      const headers = new HttpHeaders({
+        'Authorization': `Bearer ${authInfo[0]}`
+      });
+      return this.http.patch<any>(`${this.apiUrl}/users/${userId}`, user, { headers: headers });
+    } else {
+      return throwError('Unauthorized access');
+    }
+  }
+  
 }

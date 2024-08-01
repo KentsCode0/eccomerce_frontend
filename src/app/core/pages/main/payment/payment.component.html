@@ -17,7 +17,7 @@
                   <h5 class="text-xl font-semibold">{{ item.product_name }}</h5>
                   <p class="text-gray-500">Size: {{ item.size_label }}</p>
                   <p class="text-gray-500">{{ item.product_description }}</p>
-                  <span class="text-lg font-bold">${{ item.product_price }}</span>
+                  <span class="text-lg font-bold">${{ item.price }}</span>
                   <div class="flex items-center mt-2">
                     <span class="mr-2">Quantity: {{ item.quantity }}</span>
                   </div>
@@ -33,6 +33,23 @@
     <div class="fixed right-0 top-42 w-80 bg-white shadow-lg p-6 rounded-lg h-screen overflow-y-auto">
       <h3 class="text-lg font-semibold mb-4">Payment Details</h3>
       <form (ngSubmit)="processPayment()" #paymentForm="ngForm">
+        <!-- Receiver Information -->
+        <div class="mb-4">
+          <label for="receiverName" class="block text-gray-700 mb-2">Receiver's Name</label>
+          <input type="text" id="receiverName" name="receiverName" [(ngModel)]="receiverName" #receiverNameField="ngModel" class="mt-1 block w-full border border-gray-300 rounded-lg p-2" required />
+          <div *ngIf="receiverNameField.invalid" class="text-red-500 text-sm mt-1">
+            Receiver's name is required.
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label for="receiverAddress" class="block text-gray-700 mb-2">Receiver's Address</label>
+          <input type="text" id="receiverAddress" name="receiverAddress" [(ngModel)]="receiverAddress" #receiverAddressField="ngModel" class="mt-1 block w-full border border-gray-300 rounded-lg p-2" required />
+          <div *ngIf="receiverAddressField.invalid" class="text-red-500 text-sm mt-1">
+            Receiver's address is required.
+          </div>
+        </div>
+
         <!-- Payment Methods -->
         <div class="mb-4">
           <div class="mt-0 mb-2 text-xl font-semibold">

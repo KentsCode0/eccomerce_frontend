@@ -7,11 +7,12 @@ import { response } from 'express';
 import { error } from 'console';
 import { cpSync } from 'fs';
 import { TokenService } from '../../../../shared/services/token.service';
+import { NavigationBarComponent } from "../../../../shared/navigation/navigation-bar/navigation-bar.component";
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [FormsModule, CommonModule, RouterModule],
+  imports: [FormsModule, CommonModule, RouterModule, NavigationBarComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
@@ -20,6 +21,8 @@ credentials = {
   email: '',
   password: ''
 }
+
+error: string | null = null;
 
 constructor (private userService: UserService, private router: Router, private tokenService: TokenService){}
 ngOnInit(): void {
@@ -41,6 +44,12 @@ login() {
       this.router.navigate(['../product-list']);
     },
     (error)=> {
+      this.error = error.error.errors;
+        
+        // Clear the error message after 3 seconds
+        setTimeout(() => {
+          this.error = null;
+        }, 3000);
     }
   )
 }

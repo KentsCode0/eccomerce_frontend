@@ -1,0 +1,50 @@
+<div class="container mx-auto p-4">
+  <div class="py-8 px-4 mx-auto max-w-screen-xl flex">
+    <div class="flex-1">
+      <div class="bg-white shadow-md rounded-lg px-8 pt-6 pb-8 mb-4">
+        <h1 class="text-2xl font-bold text-center mb-6">Completed Orders</h1>
+        
+        <div *ngIf="completedOrders.length === 0" class="text-center text-gray-500">
+          No completed orders found.
+        </div>
+
+        <div *ngIf="completedOrders.length > 0">
+          <ul class="divide-y divide-gray-200">
+            <li *ngFor="let order of completedOrders" class="py-4">
+              <div class="flex flex-col mb-4">
+                <p class="text-gray-500">Username: {{ order.username }}</p>
+                <p class="text-gray-500">Address: {{ order.address }}</p>
+                <p class="text-gray-500">Total Amount: {{ order.total_amount | currency }}</p>
+                <p class="text-gray-500">Order Date: {{ order.order_date }}</p>
+
+                <!-- Button to toggle items visibility -->
+                <button (click)="toggleItems(order.order_id)" class="text-blue-500  mt-2">
+                  {{ showItems[order.order_id] ? 'Hide Items' : 'Show Items' }}
+                </button>
+              </div>
+
+              <!-- Conditional display of items -->
+              <div *ngIf="showItems[order.order_id]">
+                <h4 class="text-lg font-semibold mb-2">Items:</h4>
+                <ul class="divide-y divide-gray-200">
+                  <li *ngFor="let item of order.items" class="py-4 flex items-center space-x-4">
+                    <img [src]="item.product_image" alt="Product Image" class="w-16 h-20 object-cover rounded-lg">
+                    <div class="flex-1">
+                      <h5 class="text-xl font-semibold">{{ item.product_name }}</h5>
+                      <p class="text-gray-500">Size: {{ item.size_label }}</p>
+                      <p class="text-gray-500">{{ item.product_description }}</p>
+                      <span class="text-lg font-bold">${{ item.price }}</span>
+                      <div class="flex items-center mt-2">
+                        <span class="mr-2">Quantity: {{ item.quantity }}</span>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

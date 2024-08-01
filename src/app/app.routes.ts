@@ -7,6 +7,7 @@ import { PaymentComponent } from './core/pages/main/payment/payment.component';
 import { ProductItemComponent } from './core/pages/main/product-item/product-item.component';
 import { HandleproductsComponent } from './core/pages/handleproducts/handleproducts.component';
 import { AdminComponent } from './core/pages/admin/admin.component';
+import { ProfileComponent } from './core/pages/user/profile/profile.component';
 
 export const routes: Routes = [
     {
@@ -21,6 +22,10 @@ export const routes: Routes = [
     {
         path: 'register',
         component: RegisterComponent
+    },
+    {
+        path: 'profile',
+        component: ProfileComponent
     },
     {
         path: 'product-list',

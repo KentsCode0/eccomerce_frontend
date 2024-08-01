@@ -1,3 +1,4 @@
+<app-navigation-bar></app-navigation-bar>
 <div class="flex items-center justify-center min-h-screen bg-gray-100">
   <img class="ml-4" src="../../../../../assets/images/product/logo.png" alt="logo">
   <form (ngSubmit)="login()" class="w-full bg-white shadow-md rounded-lg px-8 pt-6 pb-8 mb-4 max-w-sm mx-auto cursor-pointer transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-130 duration-300 hover:shadow-sm">
@@ -5,6 +6,7 @@
     <div class="mb-5">
       <label for="email" class="block mb-2 text-sm font-medium text-gray-700">Your email</label>
       <input [(ngModel)]="credentials.email" name="email" type="email" id="email" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 cursor-pointer transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-130 duration-300 hover:shadow-sm" placeholder="name@gmail.com" required />
+      <span *ngIf="error" class="text-red-600">{{ error }}</span>
     </div>
     <div class="mb-5">
       <label for="password" class="block mb-2 text-sm font-medium text-gray-700">Your password</label>

@@ -19,7 +19,8 @@ export class userDropdownComponent implements OnInit, OnDestroy {
   userInfo = {
     user_id: 0,
     username: '',
-    email: ''
+    email: '',
+    avatar: '',
   };
   userExists = false;
 
@@ -52,6 +53,7 @@ export class userDropdownComponent implements OnInit, OnDestroy {
         this.userInfo.user_id = response.data.user.user_id;
         this.userInfo.username = response.data.user.username;
         this.userInfo.email = response.data.user.email;
+        this.userInfo.avatar = response.data.user.avatar;
         this.userExists = true;
       },
       error => {
