@@ -28,7 +28,8 @@
 
           <!-- Quantity Selector -->
           <div class="mt-4">
-            <h3 class="text-lg font-semibold text-gray-800">Quantity</h3>
+            <span *ngIf="error" class="text-red-600">{{ error }}</span>
+            <h3 class="text-lg font-semibold text-gray-800">Quantity (Available: {{ availableStock }})</h3>
             <input type="number" [(ngModel)]="quantity" min="1" class="border border-gray-300 rounded-lg px-3 py-1 w-20" />
           </div>
 

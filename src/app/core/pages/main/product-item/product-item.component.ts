@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ProductService } from '../../../../shared/services/product.service';
 import { CartService } from '../../../../shared/services/cart.service';
 import { CommonModule } from '@angular/common';
@@ -6,11 +7,12 @@ import product from '../../../../models/product.models';
 import { TokenService } from '../../../../shared/services/token.service';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { error } from 'console';
 
 @Component({
   selector: 'app-product-item',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatSnackBarModule],
   templateUrl: './product-item.component.html',
   styleUrls: ['./product-item.component.css']
 })
@@ -24,12 +26,15 @@ export class ProductItemComponent implements OnInit {
   sizes: any[] = [];
   selectedSize: string | null = null;
   quantity: number = 1; // Initialize quantity
+  availableStock: number = 0; // Initialize available stock
+  error: string | null = null;
 
   constructor(
     private productService: ProductService,
     private cartService: CartService,
     private tokenService: TokenService,
-    private router: Router
+    private router: Router,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit() {
@@ -37,6 +42,7 @@ export class ProductItemComponent implements OnInit {
       this.productId = this.product.product_id.toString();
       this.getAllProducts();
       this.getProductSizes();
+      this.availableStock = this.product.stock; // Set available stock
     }
   }
 
@@ -48,6 +54,7 @@ export class ProductItemComponent implements OnInit {
     this.productService.getAllProducts().subscribe(
       (response) => {
         this.products = response.data.product;
+        console.log(this.products);
         this.filterOtherProducts();
       },
       (error) => {
@@ -80,6 +87,7 @@ export class ProductItemComponent implements OnInit {
     this.product = product;
     this.productId = product.product_id.toString();
     this.getProductSizes();
+    this.availableStock = product.stock; // Update available stock when switching product
     this.filterOtherProducts();
     this.switchProduct.emit(product);
   }
@@ -87,12 +95,23 @@ export class ProductItemComponent implements OnInit {
   addToCart() {
     const userId = this.tokenService.getUserId();
     // Check if userId exists
-  if (!userId) {
-    // Redirect to login page
-    this.router.navigate(['/login']);
-    return;
-  }
+    if (!userId) {
+      // Redirect to login page
+      this.router.navigate(['/login']);
+      return;
+    }
+
     if (this.product && this.selectedSize) {
+      if (this.quantity > this.availableStock) {
+        this.error = "The selected quantity exceeds the available stock.";
+        
+        // Clear the error message after 3 seconds
+        setTimeout(() => {
+          this.error = null;
+        }, 3000);
+        return; // Prevent further execution
+      }
+
       const productToAdd = {
         user_id: userId,
         product_id: this.product.product_id.toString(),
@@ -102,32 +121,35 @@ export class ProductItemComponent implements OnInit {
 
       this.cartService.getCart().subscribe(
         (cart) => {
-
-          // Ensure cart.data.carts is an array
           const cartItems = Array.isArray(cart.data.carts) ? cart.data.carts : [];
-
           const existingItem = cartItems.find(
             (item: any) =>
               item.product_id.toString() === productToAdd.product_id && item.size_id.toString() === productToAdd.size_id
           );
 
           if (existingItem) {
-            // Product with the same product_id and size_id exists, update the quantity
             const updatedQuantity = existingItem.quantity + this.quantity;
 
             this.cartService.editCart(userId, productToAdd.product_id, productToAdd.size_id, updatedQuantity).subscribe(
               (response) => {
                 this.cartService.getCart().subscribe(); // Trigger cart refresh
+                this.snackBar.open('Product added to cart!', 'Close', {
+                  duration: 3000,
+                  horizontalPosition: 'center',
+                  verticalPosition: 'top',
+                });
               },
               (error) => {
                 console.error('Error updating product in cart:', error);
               }
             );
           } else {
-            // Product with the same product_id and size_id does not exist, add new item to cart
             this.cartService.insertProductToCart(productToAdd).subscribe(
               (response) => {
                 this.cartService.getCart().subscribe(); // Trigger cart refresh
+                this.snackBar.open('Product added to the cart successfully!', 'Close', {
+                  duration: 3000
+                });
               },
               (error) => {
                 console.error('Error adding product to cart:', error);
@@ -139,6 +161,9 @@ export class ProductItemComponent implements OnInit {
           this.cartService.insertProductToCart(productToAdd).subscribe(
             (response) => {
               this.cartService.getCart().subscribe(); // Trigger cart refresh
+              this.snackBar.open('Product added to the cart successfully!', 'Close', {
+                duration: 3000
+              });
             },
             (error) => {
               console.error('Error adding product to cart:', error);

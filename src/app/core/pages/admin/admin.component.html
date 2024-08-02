@@ -25,6 +25,10 @@
           <input type="number" id="product_price" name="product_price" [(ngModel)]="product.product_price" required class="mt-1 block w-full border border-gray-300 rounded-lg p-2">
         </div>
         <div class="mb-4">
+          <label for="stock" class="block text-gray-700">Product Stock</label>
+          <input type="number" id="stock" name="stock" [(ngModel)]="product.stock" required class="mt-1 block w-full border border-gray-300 rounded-lg p-2">
+        </div>
+        <div class="mb-4">
           <label for="product_image" class="block text-gray-700">Product Image</label>
           <input type="file" id="product_image" (change)="onFileSelected($event)" class="mt-1 block w-full border border-gray-300 rounded-lg p-2">
         </div>

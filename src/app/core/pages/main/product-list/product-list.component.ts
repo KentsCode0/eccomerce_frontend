@@ -34,7 +34,10 @@ export class ProductListComponent implements OnInit {
   getAllProducts() {
     this.productService.getAllProducts().subscribe(
       (response) => {
-        this.products = response.data.product;
+        this.products = response.data.product.map((p: any) => ({
+          ...p,
+          stock: p.stock // Ensure stock is included
+        }));
         this.getProductCategories();
       },
       (error) => {

@@ -17,6 +17,7 @@ export class AdminComponent implements OnInit {
     product_name: '',
     product_description: '',
     product_image: '',
+    stock: 0,
     product_price: 0
   };
   selectedImage: File | null = null;

@@ -19,6 +19,7 @@ export class ItemCardsComponent implements OnDestroy {
   @Input() name: string = '';
   @Input() description: string = '';
   @Input() price: string = '';
+  @Input() stock: number = 0;
   @Input() image: string = '';
   @Input() product: product | null = null;
   @Output() addToCart = new EventEmitter<{ product_id: string, size_id: number, quantity: number }>();

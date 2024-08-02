@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { NavigationBarComponent } from "../../../../shared/navigation/navigation-bar/navigation-bar.component";
 import { CartService } from '../../../../shared/services/cart.service';
 import { CommonModule } from '@angular/common';
@@ -26,25 +26,31 @@ export class CartListComponent implements OnInit {
     private router: Router, 
     private tokenService: TokenService, 
     private productService: ProductService,
-    private checkoutService: CheckoutService
+    private checkoutService: CheckoutService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
     this.userId = this.tokenService.getUserId();
+    console.log(this.userId);
     this.getProductSizes();
   }
 
   getCartProducts() {
     this.cartService.getCart().subscribe(
       (response) => {
+        const storedSelections = this.getStoredSelections();
         this.products = response.data.carts.map((item: any) => {
           const size = this.sizes.find(size => size.size_id === item.size_id);
           return {
             ...item,
             size_label: size ? size.size_label : 'Unknown Size',
-            selected: false
+            selected: storedSelections.some((storedItem: { product_id: any; size_id: any; }) => 
+              storedItem.product_id === item.product_id && 
+              storedItem.size_id === item.size_id)
           };
         });
+        this.cdr.detectChanges(); // Ensure view updates after changes
       }
     );
   }
@@ -53,7 +59,7 @@ export class CartListComponent implements OnInit {
     this.productService.getAllProductSizes().subscribe(
       (response) => {
         this.sizes = response.data.sizes;
-        this.getCartProducts(); // Fetch the cart products after the sizes have been loaded
+        this.getCartProducts();
       }
     );
   }
@@ -61,33 +67,32 @@ export class CartListComponent implements OnInit {
   removeFromCart(productId: number, sizeId: number) {
     this.cartService.deleteItemFromCart(this.userId, productId, sizeId).subscribe(
       () => {
-        this.getCartProducts(); // Refresh the cart after removal
+        this.getCartProducts();
       }
-    )
+    );
   }
 
   increaseQuantity(productId: number, sizeId: number, currentQuantity: number) {
     this.cartService.editCart(this.userId, productId, sizeId, currentQuantity + 1).subscribe(
       () => {
-        this.getCartProducts(); // Refresh the cart after increasing quantity
+        this.getCartProducts();
       }
-    )
+    );
   }
 
   decreaseQuantity(productId: number, sizeId: number, currentQuantity: number) {
     if (currentQuantity < 2) {
       this.cartService.deleteItemFromCart(this.userId, productId, sizeId).subscribe(
         () => {
-          this.getCartProducts(); // Refresh the cart after decreasing quantity
+          this.getCartProducts();
         }
-      )
-    } 
-    else {
+      );
+    } else {
       this.cartService.editCart(this.userId, productId, sizeId, currentQuantity - 1).subscribe(
         () => {
-          this.getCartProducts(); // Refresh the cart after increasing quantity
+          this.getCartProducts();
         }
-      )
+      );
     }
   }
 
@@ -98,7 +103,7 @@ export class CartListComponent implements OnInit {
     } else {
       this.cartService.editCart(this.userId, productId, sizeId, newQuantity).subscribe(
         () => {
-          this.getCartProducts(); // Refresh the cart after updating quantity
+          this.getCartProducts();
         }
       );
     }
@@ -106,11 +111,13 @@ export class CartListComponent implements OnInit {
 
   toggleSelection(item: any) {
     item.selected = !item.selected;
+    this.storeSelections();
   }
 
   selectAll(event: any) {
     const isChecked = event.target.checked;
     this.products.forEach(item => item.selected = isChecked);
+    this.storeSelections();
   }
 
   allSelected(): boolean {
@@ -127,7 +134,26 @@ export class CartListComponent implements OnInit {
       .reduce((sum, item) => sum + (item.product_price * item.quantity), 0);
     
     return total.toFixed(2);
-  }  
+  }
+
+  storeSelections() {
+    const selectedItems = this.products
+      .filter(item => item.selected)
+      .map(item => ({
+        product_id: item.product_id,
+        size_id: item.size_id
+      }));
+    localStorage.setItem('cartSelections', JSON.stringify(selectedItems));
+  }
+
+  getStoredSelections() {
+    const storedSelections = localStorage.getItem('cartSelections');
+    return storedSelections ? JSON.parse(storedSelections) : [];
+  }
+
+  clearStoredSelections() {
+    localStorage.removeItem('cartSelections');
+  }
 
   goToCheckout() {
     if (this.hasSelectedItems()) {
@@ -137,7 +163,7 @@ export class CartListComponent implements OnInit {
           product_id: item.product_id,
           size_id: item.size_id,
           quantity: item.quantity,
-          price: parseFloat(item.product_price).toFixed(2) // Format price correctly
+          price: parseFloat(item.product_price).toFixed(2)
         }));
   
       console.log(selectedItems);
@@ -149,13 +175,12 @@ export class CartListComponent implements OnInit {
           const orderId = response.data.order_id;
           console.log(orderId);
   
-          // Get an array of observables for creating order items
           const observables = this.checkoutService.createOrderItems(orderId, selectedItems);
   
-          // Execute each observable one at a time
           forkJoin(observables).subscribe(
             () => {
               console.log(response);
+              this.clearStoredSelections();
               this.router.navigate(['/payment'], { queryParams: { orderId } });
             },
             (error) => {

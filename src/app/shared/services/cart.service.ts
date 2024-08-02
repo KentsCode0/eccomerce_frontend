@@ -58,21 +58,14 @@ export class CartService {
   }
 
   public updateCartCount(cartResponse?: any): void {
-    // Check if cartResponse and cartResponse.data are defined
     if (cartResponse && cartResponse.data) {
-      // Log the entire response for debugging
   
-      // Ensure cartItems is an array
       const cartItems = Array.isArray(cartResponse.data.carts) ? cartResponse.data.carts : [];
   
-      // Calculate total quantity
       const totalQuantity = cartItems.reduce((acc: number, item: any) => acc + (item.quantity || 0), 0);
-  
-      // Log total quantity for debugging
   
       this.cartItemCountSubject.next(totalQuantity);
     } else {
-      // Log response for debugging
       this.cartItemCountSubject.next(0);
     }
   }

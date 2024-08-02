@@ -3,11 +3,12 @@ import { ProductService } from '../../../shared/services/product.service';
 import { AdminService } from '../../../shared/services/admin.service';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-handleproducts',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './handleproducts.component.html',
   styleUrls: ['./handleproducts.component.css']
 })
@@ -161,6 +162,21 @@ export class HandleproductsComponent implements OnInit {
         console.error('Failed to remove size', error);
       }
     );
+  }
+
+  updateStock(productId: number, newStock: number) {
+    const product = this.products.find(p => p.product_id === productId);
+    if (product) {
+      product.stock = newStock;
+      this.adminService.editProduct(product, productId).subscribe(
+        (response) => {
+          console.log('Stock updated successfully', response);
+        },
+        (error) => {
+          console.error('Failed to update stock', error);
+        }
+      );
+    }
   }
 
   goToAdmin() {

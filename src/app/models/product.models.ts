@@ -4,6 +4,7 @@ type product = {
     product_description: string,
     product_image: string,
     product_price: string,
+    stock: number,
     created_at: string,
     updated_at: string,
     category_id?: string;

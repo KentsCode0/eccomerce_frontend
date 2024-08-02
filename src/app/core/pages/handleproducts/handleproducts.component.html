@@ -12,6 +12,14 @@
         </div>
       </div>
       <!-- Product Details -->
+      <div class="mb-4">
+        <label for="stock" class="block text-gray-700">Product Stock</label>
+        <input  class="w-full"
+        type="number" 
+        [(ngModel)]="product.stock" 
+        placeholder="Enter stock" 
+        (change)="updateStock(product.product_id, product.stock)"
+      /> </div>
       <div class="p-4">
         <!-- <p class="text-gray-600 mb-4">{{ product.product_description }}</p> -->
         <div class="mb-4">

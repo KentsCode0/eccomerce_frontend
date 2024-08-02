@@ -18,6 +18,9 @@ export class AdminService {
     return this.http.post<any>(`${this.apiUrl}/products/${productId}/productimage`, image)
   }
 
+  editProduct(product: any, productId: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/products/${productId}`, product);
+  }
   createCategory(category: any) {
     return this.http.post<any>(`${this.apiUrl}/categories`, category)
   }
