@@ -8,6 +8,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProductItemComponent } from "../product-item/product-item.component";
 import { TokenService } from '../../../../shared/services/token.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-product-list',
@@ -24,12 +25,13 @@ export class ProductListComponent implements OnInit {
   categories: any[] = [];
   selectedCategory: string | null = null;
 
-  constructor(private productService: ProductService, private cartService: CartService, private tokenService: TokenService) {}
+  constructor(private productService: ProductService, private cartService: CartService, private tokenService: TokenService, private router: Router) {}
 
   ngOnInit() {
     this.getAllProducts();
     this.getAllCategories();
   }
+  
 
   getAllProducts() {
     this.productService.getAllProducts().subscribe(

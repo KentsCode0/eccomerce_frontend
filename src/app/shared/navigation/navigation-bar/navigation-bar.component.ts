@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { DropdownComponent } from "../dropdown/dropdown.component";
 import { userDropdownComponent } from '../../../core/pages/user/user-dropdown/user-dropdown.component';
+import { TokenService } from '../../services/token.service';
 
 
 @Component({
@@ -13,7 +14,7 @@ import { userDropdownComponent } from '../../../core/pages/user/user-dropdown/us
 })
 export class NavigationBarComponent {
 
-  constructor(private router: Router){}
+  constructor(private router: Router, private tokenService: TokenService){}
   
   navigateToCart() {
     this.router.navigate([`./cart`])
@@ -22,4 +23,9 @@ export class NavigationBarComponent {
   navigateToProductlist() {
     this.router.navigate([`./product-list`])
   }
+
+  signOut() {
+    this.tokenService.clearAuth();
+  }
+
 }
